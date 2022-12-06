@@ -117,22 +117,36 @@ func current_dir_node():
 	return $VBoxContainer/HBoxContainer2/CurrentDir
 func _on_RegexFind_text_changed():
 	var t = $VBoxContainer/HBoxContainer/RegexFind.text
+	var t2 =  null
+	var reg_temp = RegEx.new()
+	reg_temp.compile(t)
+	print(t)
+	print(reg_temp.get_group_count())
+	if reg_temp.get_group_count()==0:
+		t2="("+t+")"
 	var r = RegEx.new()
-	var Validation = r.compile(t)
+	print(t2)
+	var Validation = r.compile(t) if not t2 else r.compile(t2)
 	
+	if $VBoxContainer/HBoxContainer/RegexReplace.text=="":
+		regex_out_string = "$1"
+		$VBoxContainer/HBoxContainer/RegexReplace.text = "$1"
+		
+	#_on_RegexReplace_text_changed()
 	if Validation == OK:
 		regex_string = t
 		regex_machine = r
 		_on_PickFile_dir_selected(current_dir())
 		#$VBoxContainer/HBoxContainer/RegexFind.set_custom_bg_color(0, Color(0,222,0))
 	else:
-		pass#print("failed compilation")#$VBoxContainer/HBoxContainer/RegexFind.set_custom_bg_color ( Color(0,0,222))
+		print("failed compilation")#$VBoxContainer/HBoxContainer/RegexFind.set_custom_bg_color ( Color(0,0,222))
 	
 	 # Replace with function body.
 
 
 func _on_RegexReplace_text_changed():
 	regex_out_string = $VBoxContainer/HBoxContainer/RegexReplace.text
+	
 	_on_PickFile_dir_selected(current_dir())
 
 
@@ -145,6 +159,7 @@ func _on_groupfolder_pressed():
 	print(new_dir_name)
 	if not directory.dir_exists(new_dir_name):
 		directory.make_dir(new_dir_name)
+		
 	for F in files_out:
 		var from = current_dir()+"\\"+F[0]
 		var to = new_dir_name+"\\"+F[1]
@@ -152,6 +167,7 @@ func _on_groupfolder_pressed():
 		#var status=directory.copy(current_dir()+"/"+F[0],new_dir_name+"/"+F[1])
 		var output = []
 		var status = OS.execute("CMD.EXE",[ "/C","mv \""+from+"\" \""+to+"\""],true,output)
+		
 	_on_PickFile_dir_selected(current_dir())
 	
 	
@@ -201,4 +217,9 @@ func _on_extract_pressed():
 
 
 func _on_cpy_text_pressed():
+	
+	$VBoxContainer/HBoxContainer3/CopyArea.text = $VBoxContainer/HBoxContainer3/CopyArea.text.replace("(","\\(")
+	$VBoxContainer/HBoxContainer3/CopyArea.text = $VBoxContainer/HBoxContainer3/CopyArea.text.replace(")","\\)")
 	OS.set_clipboard($VBoxContainer/HBoxContainer3/CopyArea.text) # Replace with function body.
+	$VBoxContainer/HBoxContainer/RegexFind.text= $VBoxContainer/HBoxContainer3/CopyArea.text
+	_on_RegexFind_text_changed()
