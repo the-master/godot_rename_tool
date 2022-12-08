@@ -104,6 +104,7 @@ func _on_PickFile_dir_selected(dir):
 			var new_node = file_ui_component_2.duplicate()
 			new_node.text=regex_machine.sub(F,regex_out_string)
 			files_out.append([F,regex_machine.sub(F,regex_out_string)])
+			
 			new_node.visible = true
 			file_collection_2.add_child(new_node)
 	if copy_text:
@@ -157,11 +158,16 @@ func _on_groupfolder_pressed():
 	if not $VBoxContainer/HBoxContainer2/TextEdit.text.empty():
 		new_dir_name+="\\"+$VBoxContainer/HBoxContainer2/TextEdit.text
 	print(new_dir_name)
-	if not directory.dir_exists(new_dir_name):
-		directory.make_dir(new_dir_name)
+	if new_dir_name.ends_with(" ") or new_dir_name.begins_with(" "):
+		print("no spaces at begin or end")
+		return
+	
 		
 	for F in files_out:
 		var from = current_dir()+"\\"+F[0]
+		new_dir_name = regex_machine.sub(F[0],new_dir_name)
+		if not directory.dir_exists(new_dir_name):
+			directory.make_dir(new_dir_name)
 		var to = new_dir_name+"\\"+F[1]
 		print("mv \""+from+"\" \""+to+"\"")
 		#var status=directory.copy(current_dir()+"/"+F[0],new_dir_name+"/"+F[1])
@@ -200,21 +206,35 @@ func _on_Destroy_pressed():
 
 
 func _on_extract_pressed():
+	print("extract")
 	for F in files:
+		var all_sucesfully_moved = true
 		if is_folder(F):
+				print(current_dir()+"\\"+F)
 				var d = Directory.new()
-			#	print(F)
-				d.open(current_dir()+"\\"+F)
+				
+				var err = d.open(current_dir()+"\\"+F)
+				if err:
+					print("failed opening "+F)
+					continue
 				d.list_dir_begin()
 				var file = d.get_next()
+				
 				while file != "":
 					if not file.begins_with("."):
-						 print("/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'")
-						 OS.execute("CMD.EXE",[ "/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'"],true,output)
+						print("/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'")					
+						OS.execute("CMD.EXE",[ "/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'"],true,output)
+						
+						if output[0].length()>0:
+							all_sucesfully_moved = false
 						 #OS.execute("CMD.EXE",[ "/C","rmdir "+"'"+current_dir()+"\\"+F+"'"],true,output)
 					file = d.get_next()
 				d.list_dir_end()
+				if all_sucesfully_moved:
+					print("rmdir /S /Q \""+current_dir()+"\\"+F+"\"")
+					OS.execute("CMD.EXE",[ "/C","rmdir /S /Q \""+current_dir()+"\\"+F+"\""],true,output)
 					 # Replace with function body.
+	_on_PickFile_dir_selected(current_dir())
 
 
 func _on_cpy_text_pressed():
