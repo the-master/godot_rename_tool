@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Control.gd" type="Script" id=1]
 [ext_resource path="res://RegexReplace.gd" type="Script" id=2]
 [ext_resource path="res://RegexFind.gd" type="Script" id=3]
 [ext_resource path="res://TextEdit.gd" type="Script" id=4]
 [ext_resource path="res://renames.gd" type="Script" id=5]
+[ext_resource path="res://cpy_text.gd" type="Script" id=6]
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -22,6 +23,7 @@ access = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+size_flags_stretch_ratio = 2.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 margin_right = 1024.0
@@ -48,6 +50,7 @@ text = "directory: "
 margin_left = 168.0
 margin_right = 548.0
 margin_bottom = 20.0
+focus_neighbour_left = NodePath("../../HBoxContainer/RegexReplace")
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 4.0
@@ -64,6 +67,8 @@ text = "new directory"
 margin_left = 643.0
 margin_right = 1024.0
 margin_bottom = 20.0
+focus_next = NodePath("../../HBoxContainer/HBoxContainer/group-folder")
+focus_previous = NodePath("../../HBoxContainer/RegexReplace")
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 4.0
@@ -88,6 +93,9 @@ text = "pick folder"
 margin_left = 206.0
 margin_right = 611.0
 margin_bottom = 38.0
+focus_neighbour_right = NodePath("../RegexReplace")
+focus_next = NodePath("../RegexReplace")
+focus_previous = NodePath("../RegexReplace")
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
 custom_colors/caret_background_color = Color( 0.0666667, 0.960784, 0.129412, 1 )
@@ -98,6 +106,10 @@ script = ExtResource( 3 )
 margin_left = 615.0
 margin_right = 817.0
 margin_bottom = 38.0
+focus_neighbour_left = NodePath("../RegexFind")
+focus_neighbour_right = NodePath("../../HBoxContainer2/CurrentDir")
+focus_next = NodePath("../../HBoxContainer2/TextEdit")
+focus_previous = NodePath("../RegexFind")
 size_flags_horizontal = 3
 script = ExtResource( 2 )
 
@@ -111,6 +123,8 @@ size_flags_vertical = 3
 [node name="group-folder" type="Button" parent="VBoxContainer/HBoxContainer/HBoxContainer"]
 margin_right = 65.0
 margin_bottom = 38.0
+focus_next = NodePath("../Destroy")
+focus_previous = NodePath("../../../HBoxContainer2/TextEdit")
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "rename"
@@ -119,6 +133,8 @@ text = "rename"
 margin_left = 69.0
 margin_right = 134.0
 margin_bottom = 38.0
+focus_next = NodePath("../extract")
+focus_previous = NodePath("../group-folder")
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "trash"
@@ -127,6 +143,8 @@ text = "trash"
 margin_left = 138.0
 margin_right = 203.0
 margin_bottom = 38.0
+focus_next = NodePath("../../RegexFind")
+focus_previous = NodePath("../Destroy")
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "extract"
@@ -152,6 +170,7 @@ margin_bottom = 20.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "copy"
+script = ExtResource( 6 )
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 margin_top = 90.0
@@ -208,6 +227,7 @@ margin_bottom = 70.0
 
 [connection signal="dir_selected" from="PickFile" to="." method="_on_PickFile_dir_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer2/UPButton" to="." method="_on_UPButton_pressed"]
+[connection signal="text_changed" from="VBoxContainer/HBoxContainer2/TextEdit" to="." method="_on_TextEdit_text_changed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="text_changed" from="VBoxContainer/HBoxContainer/RegexFind" to="." method="_on_RegexFind_text_changed"]
 [connection signal="text_changed" from="VBoxContainer/HBoxContainer/RegexReplace" to="." method="_on_RegexReplace_text_changed"]

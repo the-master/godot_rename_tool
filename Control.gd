@@ -167,7 +167,8 @@ func _on_groupfolder_pressed():
 		#var status=directory.copy(current_dir()+"/"+F[0],new_dir_name+"/"+F[1])
 		var output = []
 		var status = OS.execute("CMD.EXE",[ "/C","mv \""+from+"\" \""+to+"\""],true,output)
-		
+		for x in output:
+			print(x)
 	_on_PickFile_dir_selected(current_dir())
 	
 	
@@ -188,8 +189,8 @@ func _on_File_meta_clicked(meta):
 func _on_Destroy_pressed():
 	for f in files_out:
 		if is_folder(f[0]):
-			#OS.execute("CMD.EXE",[ "/C","rm -rf "+f],true,output)
-			print("rm -rf "+f[0])
+			OS.execute("CMD.EXE",[ "/C","rmdir /S /Q \""+current_dir()+"\\"+f[0]+"\""],true,output)
+			print("rmdir /S /Q \""+current_dir()+"\\"+f[0]+"\"")
 		else:
 			OS.execute("CMD.EXE",[ "/C","rm \""+current_dir()+"\\"+f[0]+"\""],true,output)
 			folder_cache.erase(f[0])
@@ -208,7 +209,7 @@ func _on_extract_pressed():
 				var file = d.get_next()
 				while file != "":
 					if not file.begins_with("."):
-						# print("mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'")
+						 print("/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'")
 						 OS.execute("CMD.EXE",[ "/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'"],true,output)
 						 #OS.execute("CMD.EXE",[ "/C","rmdir "+"'"+current_dir()+"\\"+F+"'"],true,output)
 					file = d.get_next()
@@ -217,9 +218,28 @@ func _on_extract_pressed():
 
 
 func _on_cpy_text_pressed():
-	
-	$VBoxContainer/HBoxContainer3/CopyArea.text = $VBoxContainer/HBoxContainer3/CopyArea.text.replace("(","\\(")
-	$VBoxContainer/HBoxContainer3/CopyArea.text = $VBoxContainer/HBoxContainer3/CopyArea.text.replace(")","\\)")
+	var CopyArea = $VBoxContainer/HBoxContainer3/CopyArea
+	CopyArea.text = CopyArea.text.percent_decode()
+	CopyArea.text = CopyArea.text.replace("(","\\(")
+	CopyArea.text = CopyArea.text.replace(")","\\)")
+	CopyArea.text = CopyArea.text.replace("[","\\[")
+	CopyArea.text = CopyArea.text.replace("]","\\]")
 	OS.set_clipboard($VBoxContainer/HBoxContainer3/CopyArea.text) # Replace with function body.
 	$VBoxContainer/HBoxContainer/RegexFind.text= $VBoxContainer/HBoxContainer3/CopyArea.text
 	_on_RegexFind_text_changed()
+
+
+func _on_TextEdit_text_changed():
+	var NewDirField = $VBoxContainer/HBoxContainer2/TextEdit
+	NewDirField.text = NewDirField.text.percent_decode()
+	NewDirField.text = NewDirField.text.replace("\\(","(")
+	NewDirField.text = NewDirField.text.replace("\\)",")")
+	NewDirField.text = NewDirField.text.replace("\\[","[")
+	NewDirField.text = NewDirField.text.replace("\\]","]")
+	NewDirField.cursor_set_column(NewDirField.text.length())
+	
+func _input(event):
+	if event.is_action_pressed("ui_copy"):
+		_on_cpy_text_pressed()
+		get_tree().set_input_as_handled()
+	

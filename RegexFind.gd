@@ -1,4 +1,4 @@
-extends TextEdit
+extends "res://EditTabFixed.gd"
 
 
 # Declare member variables here. Examples:
@@ -9,8 +9,7 @@ extends TextEdit
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.set_tooltip("Regex and capture groups ") # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
+	self.grab_focus()
+ #time since the previous frame.
 #func _process(delta):
 #	pass

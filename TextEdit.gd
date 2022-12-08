@@ -1,4 +1,4 @@
-extends TextEdit
+extends "res://EditTabFixed.gd"
 
 
 # Declare member variables here. Examples:
