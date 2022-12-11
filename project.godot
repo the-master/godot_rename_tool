@@ -14,6 +14,10 @@ config/name="mass_rename_tool"
 run/main_scene="res://Control.tscn"
 config/icon="res://icon.png"
 
+[editor]
+
+main_run_args="I:\\torr\\Series\\dump"
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true

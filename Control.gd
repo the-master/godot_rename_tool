@@ -13,18 +13,17 @@ var folder_cache = {}
 var regex_string = ".*"
 var regex_out_string =""
 var regex_machine = null
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	_on_RegexFind_text_changed()
 	$VBoxContainer/HBoxContainer/RegexFind.text = regex_string
-	$PickFile.current_dir ="I:\\torr"
-	_on_PickFile_dir_selected( "I:\\torr" )# Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
-
+	
+	var default_dir = "I:\\torr"
+	if OS.get_cmdline_args():
+		print("ssss"+OS.get_cmdline_args()[0])
+		default_dir = OS.get_cmdline_args()[0]
+	$PickFile.current_dir =default_dir
+	_on_PickFile_dir_selected( default_dir )
+	
 func _on_Button_pressed():
 	$PickFile.popup() # Replace with function body.
 
@@ -155,20 +154,22 @@ func _on_groupfolder_pressed():
 	var directory = Directory.new()
 	
 	var new_dir_name = current_dir() 
+	
 	if not $VBoxContainer/HBoxContainer2/TextEdit.text.empty():
 		new_dir_name+="\\"+$VBoxContainer/HBoxContainer2/TextEdit.text
-	print(new_dir_name)
+
 	if new_dir_name.ends_with(" ") or new_dir_name.begins_with(" "):
 		print("no spaces at begin or end")
 		return
 	
 		
 	for F in files_out:
+		var new_dir_local = new_dir_name
 		var from = current_dir()+"\\"+F[0]
-		new_dir_name = regex_machine.sub(F[0],new_dir_name)
-		if not directory.dir_exists(new_dir_name):
-			directory.make_dir(new_dir_name)
-		var to = new_dir_name+"\\"+F[1]
+		new_dir_local = regex_machine.sub(F[0],new_dir_local)
+		if not directory.dir_exists(new_dir_local):
+			OS.execute("CMD.EXE",[ "/C","mkdir \""+new_dir_local+"\""],true,output)
+		var to = new_dir_local+"\\"+F[1]
 		print("mv \""+from+"\" \""+to+"\"")
 		#var status=directory.copy(current_dir()+"/"+F[0],new_dir_name+"/"+F[1])
 		var output = []
@@ -208,32 +209,36 @@ func _on_Destroy_pressed():
 func _on_extract_pressed():
 	print("extract")
 	for F in files:
+		if not is_folder(F):
+			continue
+			
 		var all_sucesfully_moved = true
-		if is_folder(F):
-				print(current_dir()+"\\"+F)
-				var d = Directory.new()
+			
+		print(current_dir()+"\\"+F)
+		var d = Directory.new()
+		
+		var err = d.open(current_dir()+"\\"+F)
+		if err:
+			print("failed opening "+F)
+			continue
+			
+		d.list_dir_begin()
+		var file = d.get_next()
+		
+		while file != "":
+			if not file.begins_with("."):
+				print("/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'")					
+				OS.execute("CMD.EXE",[ "/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'"],true,output)
 				
-				var err = d.open(current_dir()+"\\"+F)
-				if err:
-					print("failed opening "+F)
-					continue
-				d.list_dir_begin()
-				var file = d.get_next()
-				
-				while file != "":
-					if not file.begins_with("."):
-						print("/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'")					
-						OS.execute("CMD.EXE",[ "/C","mv "+"'"+current_dir()+"\\"+F+"\\"+file+"' '"+current_dir()+"\\"+file+"'"],true,output)
-						
-						if output[0].length()>0:
-							all_sucesfully_moved = false
-						 #OS.execute("CMD.EXE",[ "/C","rmdir "+"'"+current_dir()+"\\"+F+"'"],true,output)
-					file = d.get_next()
-				d.list_dir_end()
-				if all_sucesfully_moved:
-					print("rmdir /S /Q \""+current_dir()+"\\"+F+"\"")
-					OS.execute("CMD.EXE",[ "/C","rmdir /S /Q \""+current_dir()+"\\"+F+"\""],true,output)
-					 # Replace with function body.
+				if output[0].length()>0:
+					all_sucesfully_moved = false
+				 #OS.execute("CMD.EXE",[ "/C","rmdir "+"'"+current_dir()+"\\"+F+"'"],true,output)
+			file = d.get_next()
+		d.list_dir_end()
+		if all_sucesfully_moved:
+			print("rmdir /S /Q \""+current_dir()+"\\"+F+"\"")
+			OS.execute("CMD.EXE",[ "/C","rmdir /S /Q \""+current_dir()+"\\"+F+"\""],true,output)
+			 # Replace with function body.
 	_on_PickFile_dir_selected(current_dir())
 
 
@@ -262,4 +267,16 @@ func _input(event):
 	if event.is_action_pressed("ui_copy"):
 		_on_cpy_text_pressed()
 		get_tree().set_input_as_handled()
+
+
+func _on_MYNewButton_pressed():
 	
+	$VBoxContainer/HBoxContainer/RegexFind.text += ".*[s|S](..)[e|E](..).*(....)"
+	_on_RegexFind_text_changed()
+	if $VBoxContainer/HBoxContainer/RegexReplace.text.ends_with("$1"):
+		$VBoxContainer/HBoxContainer/RegexReplace.text = $VBoxContainer/HBoxContainer/RegexReplace.text.substr(0,$VBoxContainer/HBoxContainer/RegexReplace.text.length()-2)
+	
+	$VBoxContainer/HBoxContainer/RegexReplace.text += " S$1E$2$3"
+	_on_RegexReplace_text_changed()
+		
+

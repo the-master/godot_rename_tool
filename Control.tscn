@@ -111,6 +111,7 @@ focus_neighbour_right = NodePath("../../HBoxContainer2/CurrentDir")
 focus_next = NodePath("../../HBoxContainer2/TextEdit")
 focus_previous = NodePath("../RegexFind")
 size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource( 2 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
@@ -120,8 +121,16 @@ margin_bottom = 38.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="MYNewButton" type="Button" parent="VBoxContainer/HBoxContainer/HBoxContainer"]
+margin_right = 30.0
+margin_bottom = 38.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "-+"
+
 [node name="group-folder" type="Button" parent="VBoxContainer/HBoxContainer/HBoxContainer"]
-margin_right = 65.0
+margin_left = 34.0
+margin_right = 95.0
 margin_bottom = 38.0
 focus_next = NodePath("../Destroy")
 focus_previous = NodePath("../../../HBoxContainer2/TextEdit")
@@ -130,8 +139,8 @@ size_flags_vertical = 3
 text = "rename"
 
 [node name="Destroy" type="Button" parent="VBoxContainer/HBoxContainer/HBoxContainer"]
-margin_left = 69.0
-margin_right = 134.0
+margin_left = 99.0
+margin_right = 143.0
 margin_bottom = 38.0
 focus_next = NodePath("../extract")
 focus_previous = NodePath("../group-folder")
@@ -140,7 +149,7 @@ size_flags_vertical = 3
 text = "trash"
 
 [node name="extract" type="Button" parent="VBoxContainer/HBoxContainer/HBoxContainer"]
-margin_left = 138.0
+margin_left = 147.0
 margin_right = 203.0
 margin_bottom = 38.0
 focus_next = NodePath("../../RegexFind")
@@ -231,6 +240,7 @@ margin_bottom = 70.0
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="text_changed" from="VBoxContainer/HBoxContainer/RegexFind" to="." method="_on_RegexFind_text_changed"]
 [connection signal="text_changed" from="VBoxContainer/HBoxContainer/RegexReplace" to="." method="_on_RegexReplace_text_changed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/HBoxContainer/MYNewButton" to="." method="_on_MYNewButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/HBoxContainer/group-folder" to="." method="_on_groupfolder_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/HBoxContainer/Destroy" to="." method="_on_Destroy_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/HBoxContainer/extract" to="." method="_on_extract_pressed"]
